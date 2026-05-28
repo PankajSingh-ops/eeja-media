@@ -25,7 +25,7 @@ const fmtFollowers = (n: number) => {
 };
 
 const roleBadge = (role: string) => {
-  const c: Record<string, string> = { creator: "#8b5cf6", influencer: "#f59e0b", brand: "#14b8a6" };
+  const c: Record<string, string> = { creator: "#8b5cf6", influencer: "#f59e0b" };
   return <span style={{ background: c[role] || "#666", color: "#fff", padding: "2px 10px", borderRadius: "999px", fontSize: "0.7rem", fontWeight: 600, textTransform: "capitalize" }}>{role}</span>;
 };
 
@@ -89,7 +89,7 @@ export default function RegistrationsPage() {
           <span style={{ position: "absolute", left: "0.6rem", top: "50%", transform: "translateY(-50%)", color: "#6b7280" }}>🔍</span>
           <input placeholder="Search name..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} style={{ ...inputStyle, width: "100%", paddingLeft: "2rem" }} />
         </div>
-        <select value={roleFilter} onChange={e => { setRoleFilter(e.target.value); setPage(1); }} style={selectStyle}><option value="">All Roles</option>{["creator", "influencer", "brand"].map(r => <option key={r} value={r} style={{ textTransform: "capitalize" }}>{r}</option>)}</select>
+        <select value={roleFilter} onChange={e => { setRoleFilter(e.target.value); setPage(1); }} style={selectStyle}><option value="">All Roles</option>{["creator", "influencer"].map(r => <option key={r} value={r} style={{ textTransform: "capitalize" }}>{r}</option>)}</select>
         <select value={nicheFilter} onChange={e => { setNicheFilter(e.target.value); setPage(1); }} style={selectStyle}><option value="">All Niches</option>{NICHES.map(n => <option key={n} value={n}>{n}</option>)}</select>
         <select value={platformFilter} onChange={e => { setPlatformFilter(e.target.value); setPage(1); }} style={selectStyle}><option value="">All Platforms</option>{PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}</select>
         <input type="number" placeholder="Min Followers" value={minFollowers} onChange={e => { setMinFollowers(e.target.value); setPage(1); }} style={{ ...inputStyle, width: "120px" }} />

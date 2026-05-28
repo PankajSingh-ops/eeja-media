@@ -9,7 +9,7 @@ import Link from "next/link";
 
 interface Stats {
   total: number;
-  byRole: { creator: number; influencer: number; brand: number };
+  byRole: { creator: number; influencer: number };
   byNiche: Record<string, number>;
   byPlatform: Record<string, number>;
   recentWeek: number;
@@ -28,7 +28,7 @@ interface Creator {
 }
 
 const roleBadge = (role: string) => {
-  const colors: Record<string, string> = { creator: "#8b5cf6", influencer: "#f59e0b", brand: "#14b8a6" };
+  const colors: Record<string, string> = { creator: "#8b5cf6", influencer: "#f59e0b" };
   return (
     <span style={{ background: colors[role] || "#666", color: "#fff", padding: "2px 10px", borderRadius: "999px", fontSize: "0.75rem", fontWeight: 600, textTransform: "capitalize" }}>
       {role}
@@ -49,7 +49,6 @@ export default function DashboardPage() {
   const roleData = stats ? [
     { name: "Creator", value: stats.byRole.creator },
     { name: "Influencer", value: stats.byRole.influencer },
-    { name: "Brand", value: stats.byRole.brand },
   ] : [];
 
   return (
@@ -60,7 +59,6 @@ export default function DashboardPage() {
         <StatCard title="Total Registrations" value={stats?.total ?? "—"} />
         <StatCard title="Creators" value={stats?.byRole.creator ?? "—"} />
         <StatCard title="Influencers" value={stats?.byRole.influencer ?? "—"} accent="#f59e0b" />
-        <StatCard title="Brands" value={stats?.byRole.brand ?? "—"} accent="#14b8a6" />
         <StatCard title="Avg Post Charge" value={stats ? `₹${stats.avgCharge}` : "—"} accent="#ec4899" />
         <StatCard title="New This Week" value={stats?.recentWeek ?? "—"} accent="#22c55e" />
       </div>

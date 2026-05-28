@@ -3,7 +3,7 @@
 import { useState, FormEvent } from "react";
 import axios from "axios";
 
-const ROLES = ["creator", "influencer", "brand"] as const;
+const ROLES = ["creator", "influencer"] as const;
 const PLATFORMS = ["Instagram", "YouTube", "TikTok", "Twitter/X", "Facebook", "LinkedIn", "Other"] as const;
 const NICHES = ["Fashion", "Tech", "Fitness", "Food", "Travel", "Gaming", "Beauty", "Finance", "Education", "Lifestyle", "Entertainment", "Other"] as const;
 
@@ -39,6 +39,8 @@ export default function CreatorForm() {
   const [additionalPageUrl, setAdditionalPageUrl] = useState("");
   const [bio, setBio] = useState("");
   const [location, setLocation] = useState("");
+  const [exclusiveManagement, setExclusiveManagement] = useState(false);
+  const [previousBrandCollab, setPreviousBrandCollab] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -65,6 +67,7 @@ export default function CreatorForm() {
         socialLinks: { ...socials, ...(extraPlatforms.length ? { other: extraPlatforms.map(p => `${p.name}: ${p.url}`).join(", ") } : {}) },
         totalFollowers: Number(totalFollowers), perPostCharge: Number(perPostCharge),
         additionalPageUrl: additionalPageUrl || undefined, bio: bio || undefined, location: location || undefined,
+        exclusiveManagement, previousBrandCollab,
       });
       setSuccess(true);
     } catch {
@@ -192,6 +195,22 @@ export default function CreatorForm() {
         <div>
           <label style={labelStyle}>Location</label>
           <input style={inputStyle} placeholder="City, Country (optional)" value={location} onChange={e => setLocation(e.target.value)} />
+        </div>
+
+        {/* Previous Brand Collab */}
+        <div>
+          <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "#9ca3af", fontSize: "0.95rem", cursor: "pointer" }}>
+            <input type="checkbox" checked={previousBrandCollab} onChange={e => setPreviousBrandCollab(e.target.checked)} style={{ width: "1.2rem", height: "1.2rem", accentColor: "#FBCF0F", cursor: "pointer" }} />
+            Have you done any previous brand collaboration?
+          </label>
+        </div>
+
+        {/* Exclusive Management */}
+        <div>
+          <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "#9ca3af", fontSize: "0.95rem", cursor: "pointer" }}>
+            <input type="checkbox" checked={exclusiveManagement} onChange={e => setExclusiveManagement(e.target.checked)} style={{ width: "1.2rem", height: "1.2rem", accentColor: "#FBCF0F", cursor: "pointer" }} />
+            Do you want us to manage your profile exclusively?
+          </label>
         </div>
 
         {/* Submit */}

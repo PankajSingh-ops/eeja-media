@@ -2,7 +2,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface ICreator extends Document {
   fullName: string;
-  role: "creator" | "influencer" | "brand";
+  role: "creator" | "influencer";
   niche:
     | "Fashion"
     | "Tech"
@@ -31,6 +31,8 @@ export interface ICreator extends Document {
   currency: string;
   bio?: string;
   location?: string;
+  exclusiveManagement: boolean;
+  previousBrandCollab: boolean;
   primaryPlatform:
     | "Instagram"
     | "YouTube"
@@ -46,7 +48,7 @@ const CreatorSchema = new Schema<ICreator>({
   fullName: { type: String, required: true },
   role: {
     type: String,
-    enum: ["creator", "influencer", "brand"],
+    enum: ["creator", "influencer"],
     required: true,
   },
   niche: {
@@ -82,6 +84,8 @@ const CreatorSchema = new Schema<ICreator>({
   currency: { type: String, default: "INR" },
   bio: { type: String, maxlength: 500 },
   location: { type: String },
+  exclusiveManagement: { type: Boolean, default: false },
+  previousBrandCollab: { type: Boolean, default: false },
   primaryPlatform: {
     type: String,
     enum: [

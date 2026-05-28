@@ -10,7 +10,6 @@ export async function GET() {
     const byRole = {
       creator: await Creator.countDocuments({ role: "creator" }),
       influencer: await Creator.countDocuments({ role: "influencer" }),
-      brand: await Creator.countDocuments({ role: "brand" }),
     };
 
     const nicheAgg = await Creator.aggregate([
