@@ -127,8 +127,9 @@ export default function HeroBanner() {
         style={{
           position: "absolute",
           bottom: "2rem",
-          left: "50%",
-          transform: "translateX(-50%)",
+          left: 0,
+          right: 0,
+          justifyContent: "center",
           zIndex: 10,
           display: "flex",
           flexDirection: "column",
