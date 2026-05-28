@@ -10,6 +10,7 @@ const navItems = [
   { label: "Analytics", href: "/admin/analytics", icon: "📈" },
   { label: "Export Data", href: "/admin/export", icon: "⬇️" },
   { label: "Settings", href: "/admin/settings", icon: "⚙️" },
+  { label: "Admin Accounts", href: "/admin/accounts", icon: "🛡️" },
 ];
 
 export default function Sidebar() {

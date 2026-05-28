@@ -41,7 +41,8 @@ export default function RegistrationsPage() {
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<Creator | null>(null);
 
-  useEffect(() => { axios.get("/api/creators").then(r => setCreators(r.data)).catch(() => {}); }, []);
+  const fetchCreators = useCallback(() => { axios.get("/api/creators").then(r => setCreators(r.data)).catch(() => {}); }, []);
+  useEffect(() => { fetchCreators(); }, [fetchCreators]);
 
   useEffect(() => { const t = setTimeout(() => setDebouncedSearch(search), 300); return () => clearTimeout(t); }, [search]);
 
@@ -142,7 +143,7 @@ export default function RegistrationsPage() {
       </div>
 
       {/* Drawer */}
-      {selected && <CreatorDrawer creator={selected} onClose={() => setSelected(null)} onDelete={handleDelete} />}
+      {selected && <CreatorDrawer creator={selected} onClose={() => setSelected(null)} onDelete={handleDelete} onUpdate={() => { setSelected(null); fetchCreators(); }} />}
     </>
   );
 }

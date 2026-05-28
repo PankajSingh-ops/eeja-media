@@ -1,52 +1,29 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
 import connectDB from "@/lib/mongodb";
 import Creator from "@/models/Creator";
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(req: Request, { params }: { params: { id: string } }) {
   try {
-    await connectDB();
+    const session = await getServerSession();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { id } = await params;
-    const creator = await Creator.findById(id);
+    const updateData = await req.json();
 
-    if (!creator) {
-      return NextResponse.json(
-        { error: "Creator not found" },
-        { status: 404 }
-      );
+    if (!updateData.fullName || !updateData.role || !updateData.niche || !updateData.primaryPlatform || updateData.totalFollowers == null || updateData.perPostCharge == null) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    return NextResponse.json(creator, { status: 200 });
-  } catch (error) {
-    console.error("Error fetching creator:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function DELETE(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
     await connectDB();
+    const updated = await Creator.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
 
-    const { id } = await params;
-    const deleted = await Creator.findByIdAndDelete(id);
-
-    if (!deleted) {
+    if (!updated) {
       return NextResponse.json({ error: "Creator not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "Creator deleted" }, { status: 200 });
+    return NextResponse.json(updated);
   } catch (error) {
-    console.error("Error deleting creator:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
-
