@@ -59,8 +59,8 @@ export default function RegistrationsPage() {
     if (dateTo) data = data.filter(c => new Date(c.createdAt) <= new Date(dateTo + "T23:59:59"));
 
     data.sort((a, b) => {
-      const aVal = (a as Record<string, unknown>)[sortKey];
-      const bVal = (b as Record<string, unknown>)[sortKey];
+      const aVal = (a as unknown as Record<string, unknown>)[sortKey];
+      const bVal = (b as unknown as Record<string, unknown>)[sortKey];
       if (typeof aVal === "number" && typeof bVal === "number") return sortDir === "asc" ? aVal - bVal : bVal - aVal;
       return sortDir === "asc" ? String(aVal || "").localeCompare(String(bVal || "")) : String(bVal || "").localeCompare(String(aVal || ""));
     });

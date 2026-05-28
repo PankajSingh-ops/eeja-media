@@ -19,7 +19,7 @@ export default function CreatorDrawer({ creator, onClose, onDelete }: { creator:
   if (!creator) return null;
 
   const initials = creator.fullName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
-  const roleBg: Record<string, string> = { creator: "#8b5cf6", influencer: "#f59e0b", brand: "#14b8a6" };
+  const roleBg: Record<string, string> = { creator: "#8b5cf6", influencer: "#FBCF0F", brand: "#14b8a6" };
 
   const handleDelete = () => {
     if (confirm(`Delete ${creator.fullName}? This cannot be undone.`)) {

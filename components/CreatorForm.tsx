@@ -75,14 +75,14 @@ export default function CreatorForm() {
 
   if (success) {
     return (
-      <div style={{ background: "#111", borderRadius: "20px", padding: "3rem 2rem", textAlign: "center", border: "1px solid rgba(139,92,246,0.2)" }}>
+      <div style={{ background: "#111", borderRadius: "20px", padding: "3rem 2rem", textAlign: "center", border: "1px solid rgba(251,207,15,0.2)" }}>
         <svg width="64" height="64" viewBox="0 0 64 64" style={{ margin: "0 auto 1.5rem" }}>
-          <circle cx="32" cy="32" r="30" fill="none" stroke="#8b5cf6" strokeWidth="2" opacity="0.3" />
-          <circle cx="32" cy="32" r="30" fill="none" stroke="#8b5cf6" strokeWidth="2" strokeDasharray="188" strokeDashoffset="188" style={{ animation: "checkmark 0.8s ease-out forwards" }} />
+          <circle cx="32" cy="32" r="30" fill="none" stroke="#FBCF0F" strokeWidth="2" opacity="0.3" />
+          <circle cx="32" cy="32" r="30" fill="none" stroke="#FBCF0F" strokeWidth="2" strokeDasharray="188" strokeDashoffset="188" style={{ animation: "checkmark 0.8s ease-out forwards" }} />
           <path d="M20 33 L28 41 L44 25" fill="none" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="animate-checkmark" style={{ strokeDasharray: 50, strokeDashoffset: 50 }} />
         </svg>
         <h3 style={{ fontFamily: "var(--font-heading)", fontSize: "1.75rem", fontWeight: 700, color: "#fff", marginBottom: "0.75rem" }}>Welcome to Eeja Media! 🎉</h3>
-        <p style={{ color: "#9ca3af", marginBottom: "0.5rem" }}>Thank you, <strong style={{ color: "#a78bfa" }}>{fullName}</strong></p>
+        <p style={{ color: "#9ca3af", marginBottom: "0.5rem" }}>Thank you, <strong style={{ color: "#fbbf24" }}>{fullName}</strong></p>
         <p style={{ color: "#6b7280", fontSize: "0.9rem" }}>We&apos;ll be in touch before June 3rd.</p>
       </div>
     );
@@ -105,8 +105,8 @@ export default function CreatorForm() {
             {ROLES.map(r => (
               <button type="button" key={r} onClick={() => setRole(r)} style={{
                 flex: 1, padding: "0.65rem", borderRadius: "10px", fontSize: "0.9rem", fontWeight: 600, cursor: "pointer",
-                border: role === r ? "1px solid #8b5cf6" : "1px solid #333", textTransform: "capitalize",
-                background: role === r ? "#8b5cf6" : "#1a1a1a", color: role === r ? "#fff" : "#9ca3af",
+                border: role === r ? "1px solid #FBCF0F" : "1px solid #333", textTransform: "capitalize",
+                background: role === r ? "#FBCF0F" : "#1a1a1a", color: role === r ? "#fff" : "#9ca3af",
                 transition: "all 0.2s ease",
               }}>{r}</button>
             ))}
@@ -152,7 +152,7 @@ export default function CreatorForm() {
                 <button type="button" onClick={() => setExtraPlatforms(prev => prev.filter((_, j) => j !== i))} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: "1.2rem" }}>×</button>
               </div>
             ))}
-            <button type="button" onClick={() => setExtraPlatforms(prev => [...prev, { name: "", url: "" }])} style={{ background: "none", border: "1px dashed #333", borderRadius: "10px", padding: "0.5rem", color: "#8b5cf6", cursor: "pointer", fontSize: "0.85rem", transition: "border-color 0.2s" }}>+ Add another platform</button>
+            <button type="button" onClick={() => setExtraPlatforms(prev => [...prev, { name: "", url: "" }])} style={{ background: "none", border: "1px dashed #333", borderRadius: "10px", padding: "0.5rem", color: "#FBCF0F", cursor: "pointer", fontSize: "0.85rem", transition: "border-color 0.2s" }}>+ Add another platform</button>
           </div>
         </div>
 
@@ -167,7 +167,7 @@ export default function CreatorForm() {
         <div>
           <label style={labelStyle}>Per Post Charge (INR) *</label>
           <div style={{ position: "relative" }}>
-            <span style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: "#8b5cf6", fontWeight: 700 }}>₹</span>
+            <span style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: "#FBCF0F", fontWeight: 700 }}>₹</span>
             <input type="number" style={{ ...inputStyle, paddingLeft: "2rem" }} placeholder="Your rate per sponsored post" value={perPostCharge} onChange={e => setPerPostCharge(e.target.value)} />
           </div>
           {errors.perPostCharge && <p style={{ color: "#ef4444", fontSize: "0.8rem", marginTop: "0.3rem" }}>{errors.perPostCharge}</p>}
@@ -197,11 +197,11 @@ export default function CreatorForm() {
         {/* Submit */}
         <button type="submit" disabled={loading} style={{
           width: "100%", padding: "1rem", borderRadius: "12px", border: "none", cursor: loading ? "wait" : "pointer",
-          background: "linear-gradient(135deg, #7c3aed, #8b5cf6)", color: "#fff", fontSize: "1.1rem", fontWeight: 700,
+          background: "linear-gradient(135deg, #D6AF0A, #FBCF0F)", color: "#fff", fontSize: "1.1rem", fontWeight: 700,
           transition: "all 0.3s ease", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem",
           opacity: loading ? 0.7 : 1,
         }}
-        onMouseEnter={e => { if (!loading) { e.currentTarget.style.transform = "scale(1.02)"; e.currentTarget.style.boxShadow = "0 0 30px rgba(139,92,246,0.4)"; } }}
+        onMouseEnter={e => { if (!loading) { e.currentTarget.style.transform = "scale(1.02)"; e.currentTarget.style.boxShadow = "0 0 30px rgba(251,207,15,0.4)"; } }}
         onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "none"; }}
         >
           {loading ? (<><span className="animate-spin-slow" style={{ display: "inline-block", width: "20px", height: "20px", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%" }} /> Submitting...</>) : "Join Eeja Media →"}

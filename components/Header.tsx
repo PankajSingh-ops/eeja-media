@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -53,17 +54,19 @@ export default function Header() {
           <div
             onClick={() => scrollToSection("top")}
             style={{
-              fontFamily: "var(--font-heading)",
-              fontSize: "1.5rem",
-              fontWeight: 700,
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
-              gap: "0.5rem",
             }}
           >
-            <span style={{ color: "#fff" }}>Eeja</span>
-            <span style={{ color: "#8b5cf6" }}>Media</span>
+            <Image 
+              src="/logos.png" 
+              alt="Eeja Media Logo" 
+              width={100} 
+              height={50} 
+              style={{ objectFit: "contain" }}
+              priority
+            />
           </div>
 
           {/* Desktop Nav */}
@@ -87,7 +90,7 @@ export default function Header() {
             <button
               onClick={() => scrollToSection("join")}
               style={{
-                background: "linear-gradient(135deg, #7c3aed, #8b5cf6)",
+                background: "linear-gradient(135deg, #D6AF0A, #FBCF0F)",
                 border: "none",
                 borderRadius: "999px",
                 color: "#fff",
@@ -99,7 +102,7 @@ export default function Header() {
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "scale(1.05)";
-                e.currentTarget.style.boxShadow = "0 0 15px rgba(139, 92, 246, 0.4)";
+                e.currentTarget.style.boxShadow = "0 0 15px rgba(251, 207, 15, 0.4)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "scale(1)";
@@ -170,7 +173,7 @@ export default function Header() {
           <button
             onClick={() => scrollToSection("join")}
             style={{
-              background: "linear-gradient(135deg, #7c3aed, #8b5cf6)",
+              background: "linear-gradient(135deg, #D6AF0A, #FBCF0F)",
               border: "none",
               borderRadius: "999px",
               color: "#fff",

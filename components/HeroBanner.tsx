@@ -18,7 +18,7 @@ export default function HeroBanner() {
     <section
       style={{
         minHeight: "100vh",
-        background: "#0d1033",
+        background: "#0a0a0a",
         position: "relative",
         overflow: "hidden",
         display: "flex",
@@ -36,8 +36,9 @@ export default function HeroBanner() {
             width: `${orb.size}px`,
             height: `${orb.size}px`,
             borderRadius: "50%",
-            background: `radial-gradient(circle, rgba(79,125,247,0.12) 0%, rgba(79,125,247,0.03) 60%, transparent 100%)`,
-            border: "1px solid rgba(79,125,247,0.08)",
+            background: `radial-gradient(circle, rgba(251,207,15,0.25) 0%, rgba(251,207,15,0.08) 50%, transparent 100%)`,
+            border: "1px solid rgba(251,207,15,0.15)",
+            boxShadow: "0 0 40px rgba(251,207,15,0.1), inset 0 0 30px rgba(251,207,15,0.05)",
             top: orb.top,
             left: orb.left,
             right: orb.right,
@@ -109,12 +110,12 @@ export default function HeroBanner() {
         >
           <path
             d="M0,120 C360,180 720,60 1080,120 C1260,150 1380,100 1440,110 L1440,180 L0,180 Z"
-            fill="#141a50"
+            fill="#141414"
             opacity="0.6"
           />
           <path
             d="M0,140 C320,100 640,170 960,130 C1200,100 1360,150 1440,140 L1440,180 L0,180 Z"
-            fill="#1a2570"
+            fill="#111111"
             opacity="0.9"
           />
         </svg>

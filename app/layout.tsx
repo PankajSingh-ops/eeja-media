@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   title: "Eeja Media — Where Creators & Influencers Unite",
   description:
     "Join Eeja Media, the premier platform for creators, influencers, and brands to connect, collaborate, and grow. Launching June 2026.",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({

@@ -37,7 +37,7 @@ export default function JoinSection() {
               top: 0,
               bottom: 0,
               width: "3px",
-              background: "linear-gradient(to bottom, #8b5cf6, rgba(139,92,246,0.1))",
+              background: "linear-gradient(to bottom, #FBCF0F, rgba(251,207,15,0.1))",
               borderRadius: "2px",
             }}
           />
@@ -57,7 +57,7 @@ export default function JoinSection() {
               <div key={i} style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
                 <span
                   style={{
-                    color: "#8b5cf6",
+                    color: "#FBCF0F",
                     fontSize: "1.25rem",
                     flexShrink: 0,
                     marginTop: "2px",
