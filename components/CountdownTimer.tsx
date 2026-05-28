@@ -15,11 +15,7 @@ export default function CountdownTimer() {
   const calculateTimeLeft = useCallback((): TimeLeft => {
     const now = Date.now();
     const diff = TARGET_DATE - now;
-
-    if (diff <= 0) {
-      return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-    }
-
+    if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
     return {
       days: Math.floor(diff / (1000 * 60 * 60 * 24)),
       hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
@@ -30,37 +26,23 @@ export default function CountdownTimer() {
 
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft);
   const [isLive, setIsLive] = useState(false);
-  const [pulse, setPulse] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
       const tl = calculateTimeLeft();
       setTimeLeft(tl);
-
       if (tl.days === 0 && tl.hours === 0 && tl.minutes === 0 && tl.seconds === 0) {
         setIsLive(true);
         clearInterval(interval);
       }
-
-      // Trigger pulse animation
-      setPulse(true);
-      setTimeout(() => setPulse(false), 300);
     }, 1000);
-
     return () => clearInterval(interval);
   }, [calculateTimeLeft]);
 
   if (isLive) {
     return (
-      <div className="animate-fade-in-up" style={{ textAlign: "center" }}>
-        <p
-          style={{
-            fontSize: "2.5rem",
-            fontWeight: 700,
-            fontFamily: "var(--font-heading)",
-            color: "#fff",
-          }}
-        >
+      <div style={{ textAlign: "center" }}>
+        <p style={{ fontSize: "2.5rem", fontWeight: 700, fontFamily: "var(--font-heading)", color: "#fff" }}>
           We Are Live! 🚀
         </p>
       </div>
@@ -70,63 +52,56 @@ export default function CountdownTimer() {
   const units = [
     { label: "Days", value: timeLeft.days },
     { label: "Hours", value: timeLeft.hours },
-    { label: "Minutes", value: timeLeft.minutes },
-    { label: "Seconds", value: timeLeft.seconds },
+    { label: "Mins", value: timeLeft.minutes },
+    { label: "Secs", value: timeLeft.seconds },
   ];
 
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: "1rem",
-        justifyContent: "center",
-        flexWrap: "wrap",
-      }}
-    >
-      {units.map((unit) => (
-        <div
-          key={unit.label}
-          className={pulse ? "animate-countdown-pulse" : ""}
-          style={{
-            background: "#1a1a1a",
-            border: "1px solid rgba(139, 92, 246, 0.3)",
-            borderRadius: "16px",
-            padding: "1.5rem 2rem",
-            minWidth: "100px",
-            textAlign: "center",
-            transition: "border-color 0.3s ease",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.borderColor = "rgba(139, 92, 246, 0.6)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.borderColor = "rgba(139, 92, 246, 0.3)";
-          }}
-        >
-          <span
-            style={{
-              display: "block",
-              fontSize: "2.5rem",
-              fontWeight: 700,
-              color: "#fff",
-              fontFamily: "var(--font-heading)",
-              lineHeight: 1.1,
-            }}
-          >
-            {String(unit.value).padStart(2, "0")}
-          </span>
-          <span
-            style={{
-              display: "block",
-              fontSize: "0.75rem",
-              color: "#9ca3af",
-              textTransform: "uppercase",
-              letterSpacing: "0.1em",
-              marginTop: "0.5rem",
-            }}
-          >
-            {unit.label}
-          </span>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.25rem" }}>
+      {units.map((unit, i) => (
+        <div key={unit.label} style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+          <div style={{ textAlign: "center", minWidth: "60px" }}>
+            <span
+              style={{
+                display: "block",
+                fontSize: "clamp(2rem, 5vw, 3rem)",
+                fontWeight: 300,
+                color: "#fff",
+                fontFamily: "var(--font-heading)",
+                lineHeight: 1.2,
+                letterSpacing: "0.05em",
+              }}
+            >
+              {String(unit.value).padStart(2, "0")}
+            </span>
+            <span
+              style={{
+                display: "block",
+                fontSize: "0.65rem",
+                color: "rgba(255,255,255,0.4)",
+                textTransform: "uppercase",
+                letterSpacing: "0.15em",
+                marginTop: "0.35rem",
+                fontWeight: 500,
+              }}
+            >
+              {unit.label}
+            </span>
+          </div>
+          {i < units.length - 1 && (
+            <span
+              style={{
+                fontSize: "clamp(1.5rem, 4vw, 2.25rem)",
+                fontWeight: 200,
+                color: "rgba(255,255,255,0.25)",
+                alignSelf: "flex-start",
+                marginTop: "0.15rem",
+                padding: "0 0.15rem",
+              }}
+            >
+              :
+            </span>
+          )}
         </div>
       ))}
     </div>

@@ -28,3 +28,25 @@ export async function GET(
     );
   }
 }
+
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    await connectDB();
+
+    const { id } = await params;
+    const deleted = await Creator.findByIdAndDelete(id);
+
+    if (!deleted) {
+      return NextResponse.json({ error: "Creator not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Creator deleted" }, { status: 200 });
+  } catch (error) {
+    console.error("Error deleting creator:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
