@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import connectDB from "@/lib/mongodb";
 import Creator from "@/models/Creator";
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession();
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
