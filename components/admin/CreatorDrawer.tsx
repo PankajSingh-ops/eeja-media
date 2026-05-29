@@ -26,12 +26,13 @@ interface Creator {
 }
 
 const PLATFORMS = ["Instagram", "YouTube", "TikTok", "Twitter/X", "Facebook", "LinkedIn", "Other"];
-const NICHES = ["Fashion", "Tech", "Fitness", "Food", "Travel", "Gaming", "Beauty", "Finance", "Education", "Lifestyle", "Entertainment", "Other"];
+const NICHES = ["Fashion", "Tech", "Fitness", "Food", "Travel", "Gaming", "Beauty", "Finance", "Education", "Lifestyle", "Entertainment", "AI", "Other"];
 const FORMATS = ["Reels", "Long-form", "Blogs", "Graphics", "Shorts", "Photos", "Other"];
 
 export default function CreatorDrawer({ creator, onClose, onDelete, onUpdate }: { creator: Creator | null; onClose: () => void; onDelete: (id: string) => void; onUpdate: () => void }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<Partial<Creator>>({});
+  const [customNiche, setCustomNiche] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const { showToast, ToastContainer } = useToast();
@@ -41,6 +42,7 @@ export default function CreatorDrawer({ creator, onClose, onDelete, onUpdate }: 
   const handleEditClick = () => {
     setIsEditing(true);
     setEditData({ ...creator, socialLinks: { ...creator.socialLinks } });
+    setCustomNiche("");
   };
 
   const handleCancel = () => {
@@ -51,7 +53,13 @@ export default function CreatorDrawer({ creator, onClose, onDelete, onUpdate }: 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await axios.put(`/api/creators/${creator._id}`, editData);
+      let finalNiche = editData.niche || [];
+      if (finalNiche.includes("Other") && customNiche.trim()) {
+        finalNiche = [...finalNiche.filter(n => n !== "Other"), ...customNiche.split(',').map(s => s.trim()).filter(Boolean)];
+      }
+      const dataToSave = { ...editData, niche: finalNiche };
+
+      await axios.put(`/api/creators/${creator._id}`, dataToSave);
       showToast("Changes saved", "success");
       setIsEditing(false);
       onUpdate(); // Call parent to re-fetch/update local state
@@ -154,7 +162,7 @@ export default function CreatorDrawer({ creator, onClose, onDelete, onUpdate }: 
               <div>
                 <label style={labelStyle}>Niche</label>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-                  {NICHES.map(n => {
+                  {Array.from(new Set([...NICHES, ...(editData.niche || [])])).map(n => {
                     const isSelected = (editData.niche || []).includes(n);
                     return (
                       <button
@@ -177,6 +185,16 @@ export default function CreatorDrawer({ creator, onClose, onDelete, onUpdate }: 
                     );
                   })}
                 </div>
+                {(editData.niche || []).includes("Other") && (
+                  <div className="animate-fade-in-up" style={{ marginTop: "0.75rem", animationDuration: "0.3s" }}>
+                    <input
+                      style={inputStyle}
+                      placeholder="Specify your niche (comma separated, e.g. Web3, Pets)"
+                      value={customNiche}
+                      onChange={e => setCustomNiche(e.target.value)}
+                    />
+                  </div>
+                )}
               </div>
 
               <div>

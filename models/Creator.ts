@@ -45,25 +45,7 @@ const CreatorSchema = new Schema<ICreator>({
     enum: ["creator", "influencer"],
     required: true,
   },
-  niche: [
-    {
-      type: String,
-      enum: [
-        "Fashion",
-        "Tech",
-        "Fitness",
-        "Food",
-        "Travel",
-        "Gaming",
-        "Beauty",
-        "Finance",
-        "Education",
-        "Lifestyle",
-        "Entertainment",
-        "Other",
-      ],
-    },
-  ],
+  niche: [{ type: String }],
   socialLinks: {
     instagram: { url: String, followers: Number },
     facebook: { url: String, followers: Number },

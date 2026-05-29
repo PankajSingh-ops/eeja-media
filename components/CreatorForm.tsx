@@ -5,7 +5,7 @@ import axios from "axios";
 
 const ROLES = ["creator", "influencer"] as const;
 const PLATFORMS = ["Instagram", "YouTube", "TikTok", "Twitter/X", "Facebook", "LinkedIn", "Other"] as const;
-const NICHES = ["Fashion", "Tech", "Fitness", "Food", "Travel", "Gaming", "Beauty", "Finance", "Education", "Lifestyle", "Entertainment", "Other"] as const;
+const NICHES = ["Fashion", "Tech", "Fitness", "Food", "Travel", "Gaming", "Beauty", "Finance", "Education", "Lifestyle", "Entertainment", "AI", "Other"] as const;
 const FORMATS = ["Reels", "Long-form", "Blogs", "Graphics", "Shorts", "Photos", "Other"] as const;
 
 const DEFAULT_SOCIALS = [
@@ -36,6 +36,7 @@ export default function CreatorForm() {
   const [role, setRole] = useState<string>("");
   const [primaryPlatform, setPrimaryPlatform] = useState("");
   const [niche, setNiche] = useState<string[]>([]);
+  const [customNiche, setCustomNiche] = useState("");
   const [contentFormat, setContentFormat] = useState("");
   const [socials, setSocials] = useState<Record<string, { url: string; followers?: string }>>({ instagram: { url: "" }, youtube: { url: "" }, twitter: { url: "" }, tiktok: { url: "" } });
   const [extraPlatforms, setExtraPlatforms] = useState<ExtraPlatform[]>([]);
@@ -70,7 +71,9 @@ export default function CreatorForm() {
       await axios.post("/api/creators", {
         fullName: fullName.trim(), stageName: stageName.trim() || undefined,
         email: email.trim(), phoneNumber: phoneNumber.trim(),
-        role, niche, primaryPlatform: primaryPlatform || undefined,
+        role, 
+        niche: niche.includes("Other") && customNiche.trim() ? [...niche.filter(n => n !== "Other"), ...customNiche.split(",").map(s => s.trim()).filter(Boolean)] : niche,
+        primaryPlatform: primaryPlatform || undefined,
         contentFormat: contentFormat || undefined,
         socialLinks: { 
           ...Object.fromEntries(Object.entries(socials).filter(([_, v]) => v.url).map(([k, v]) => [k, { url: v.url, followers: v.followers ? Number(v.followers) : undefined }])),
@@ -185,6 +188,16 @@ export default function CreatorForm() {
               </button>
             ))}
           </div>
+          {niche.includes("Other") && (
+            <div className="animate-fade-in-up" style={{ marginTop: "0.75rem", animationDuration: "0.3s" }}>
+              <input
+                style={inputStyle}
+                placeholder="Specify your niche (comma separated, e.g. Web3, Pets)"
+                value={customNiche}
+                onChange={e => setCustomNiche(e.target.value)}
+              />
+            </div>
+          )}
           {errors.niche && <p style={{ color: "#ef4444", fontSize: "0.8rem", marginTop: "0.3rem" }}>{errors.niche}</p>}
         </div>
 
