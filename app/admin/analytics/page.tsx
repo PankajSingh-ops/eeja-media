@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import TopBar from "@/components/admin/TopBar";
-import { PlatformPieChart, FollowerDistChart, TopNicheChargeChart, RolePieChart } from "@/components/admin/Charts";
+import { PlatformPieChart, TopNicheChargeChart, RolePieChart } from "@/components/admin/Charts";
 
 interface Creator {
-  role: string; niche: string; primaryPlatform?: string; totalFollowers: number; perPostCharge?: number;
+  role: string; niche: string[]; primaryPlatform?: string; perPostCharge?: number;
 }
 
 export default function AnalyticsPage() {
@@ -19,20 +19,16 @@ export default function AnalyticsPage() {
   creators.forEach(c => { if (c.primaryPlatform) platformCounts[c.primaryPlatform] = (platformCounts[c.primaryPlatform] || 0) + 1; });
   const platformData = Object.entries(platformCounts).map(([name, value]) => ({ name, value }));
 
-  // Follower distribution
-  const buckets = [
-    { name: "0-10K", min: 0, max: 10000 },
-    { name: "10K-100K", min: 10000, max: 100000 },
-    { name: "100K-1M", min: 100000, max: 1000000 },
-    { name: "1M+", min: 1000000, max: Infinity },
-  ];
-  const followerData = buckets.map(b => ({ name: b.name, count: creators.filter(c => c.totalFollowers >= b.min && c.totalFollowers < b.max).length }));
-
   // Top 5 niches by avg charge
   const nicheCharges: Record<string, number[]> = {};
   creators.forEach(c => { 
     if (c.perPostCharge !== undefined && c.perPostCharge !== null) {
-      (nicheCharges[c.niche] = nicheCharges[c.niche] || []).push(c.perPostCharge); 
+      const niches = Array.isArray(c.niche) ? c.niche : [c.niche];
+      niches.forEach(n => {
+        if (n) {
+          (nicheCharges[n] = nicheCharges[n] || []).push(c.perPostCharge!); 
+        }
+      });
     }
   });
   const nicheAvgData = Object.entries(nicheCharges)
@@ -55,7 +51,6 @@ export default function AnalyticsPage() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
           <TopNicheChargeChart data={nicheAvgData} />
           <PlatformPieChart data={platformData} />
-          <FollowerDistChart data={followerData} />
           <RolePieChart data={roleData} />
         </div>
       )}

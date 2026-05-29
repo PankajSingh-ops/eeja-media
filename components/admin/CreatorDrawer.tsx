@@ -12,10 +12,9 @@ interface Creator {
   email?: string;
   phoneNumber?: string;
   role: string;
-  niche: string;
+  niche: string[];
   primaryPlatform?: string;
   contentFormat?: string;
-  totalFollowers: number;
   perPostCharge?: number;
   bio?: string;
   location?: string;
@@ -154,9 +153,30 @@ export default function CreatorDrawer({ creator, onClose, onDelete, onUpdate }: 
 
               <div>
                 <label style={labelStyle}>Niche</label>
-                <select style={inputStyle} value={editData.niche || ""} onChange={e => setEditData({ ...editData, niche: e.target.value })}>
-                  {NICHES.map(n => <option key={n} value={n}>{n}</option>)}
-                </select>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                  {NICHES.map(n => {
+                    const isSelected = (editData.niche || []).includes(n);
+                    return (
+                      <button
+                        type="button"
+                        key={n}
+                        onClick={() => {
+                          const current = editData.niche || [];
+                          const updated = isSelected ? current.filter((x: string) => x !== n) : [...current, n];
+                          setEditData({ ...editData, niche: updated });
+                        }}
+                        style={{
+                          padding: "0.4rem 0.8rem", borderRadius: "20px", fontSize: "0.8rem", cursor: "pointer",
+                          border: isSelected ? "none" : "1px solid #333",
+                          background: isSelected ? "#8b5cf6" : "#1a1a1a",
+                          color: "#fff"
+                        }}
+                      >
+                        {n}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <div>
@@ -167,10 +187,6 @@ export default function CreatorDrawer({ creator, onClose, onDelete, onUpdate }: 
                 </select>
               </div>
 
-              <div>
-                <label style={labelStyle}>Total Followers</label>
-                <input type="number" style={inputStyle} value={editData.totalFollowers || 0} onChange={e => setEditData({ ...editData, totalFollowers: Number(e.target.value) })} />
-              </div>
 
               <div>
                 <label style={labelStyle}>Per Post Charge ($/₹)</label>
@@ -240,10 +256,9 @@ export default function CreatorDrawer({ creator, onClose, onDelete, onUpdate }: 
                 {[
                   { label: "Email", value: creator.email || "—" },
                   { label: "Phone", value: creator.phoneNumber || "—" },
-                  { label: "Niche", value: creator.niche },
+                  { label: "Niche", value: Array.isArray(creator.niche) ? creator.niche.join(", ") : creator.niche },
                   { label: "Format", value: creator.contentFormat || "—" },
                   { label: "Platform", value: creator.primaryPlatform || "—" },
-                  { label: "Followers", value: creator.totalFollowers?.toLocaleString() },
                   { label: "Per Post", value: creator.perPostCharge ? `₹${creator.perPostCharge}` : "—" },
                   { label: "Location", value: creator.location || "—" },
                   { label: "Joined", value: new Date(creator.createdAt).toLocaleDateString() },

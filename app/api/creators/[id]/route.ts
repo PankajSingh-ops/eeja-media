@@ -11,7 +11,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const { id } = await params;
     const updateData = await req.json();
 
-    if (!updateData.fullName || !updateData.email || !updateData.phoneNumber || !updateData.role || !updateData.niche || updateData.totalFollowers == null) {
+    if (!updateData.fullName || !updateData.email || !updateData.phoneNumber || !updateData.role || !updateData.niche) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 

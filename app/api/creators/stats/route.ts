@@ -13,6 +13,7 @@ export async function GET() {
     };
 
     const nicheAgg = await Creator.aggregate([
+      { $unwind: { path: "$niche", preserveNullAndEmptyArrays: true } },
       { $group: { _id: "$niche", count: { $sum: 1 } } },
       { $sort: { count: -1 } },
     ]);

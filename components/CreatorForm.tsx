@@ -35,11 +35,10 @@ export default function CreatorForm() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [role, setRole] = useState<string>("");
   const [primaryPlatform, setPrimaryPlatform] = useState("");
-  const [niche, setNiche] = useState("");
+  const [niche, setNiche] = useState<string[]>([]);
   const [contentFormat, setContentFormat] = useState("");
   const [socials, setSocials] = useState<Record<string, { url: string; followers?: string }>>({ instagram: { url: "" }, youtube: { url: "" }, twitter: { url: "" }, tiktok: { url: "" } });
   const [extraPlatforms, setExtraPlatforms] = useState<ExtraPlatform[]>([]);
-  const [totalFollowers, setTotalFollowers] = useState("");
   const [perPostCharge, setPerPostCharge] = useState("");
   const [additionalPageUrl, setAdditionalPageUrl] = useState("");
   const [bio, setBio] = useState("");
@@ -57,8 +56,7 @@ export default function CreatorForm() {
     if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email)) e.email = "Valid email is required";
     if (!phoneNumber.trim()) e.phoneNumber = "Phone number is required";
     if (!role) e.role = "Please select a role";
-    if (!niche) e.niche = "Please select a niche";
-    if (!totalFollowers || Number(totalFollowers) < 0) e.totalFollowers = "Enter valid follower count";
+    if (niche.length === 0) e.niche = "Please select at least one niche";
     if (perPostCharge && Number(perPostCharge) < 0) e.perPostCharge = "Enter valid charge";
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -78,7 +76,7 @@ export default function CreatorForm() {
           ...Object.fromEntries(Object.entries(socials).filter(([_, v]) => v.url).map(([k, v]) => [k, { url: v.url, followers: v.followers ? Number(v.followers) : undefined }])),
           ...(extraPlatforms.length ? { other: extraPlatforms.map(p => `${p.name}: ${p.url}${p.followers ? ` (${p.followers} followers)` : ''}`).join(", ") } : {}) 
         },
-        totalFollowers: Number(totalFollowers), perPostCharge: perPostCharge ? Number(perPostCharge) : undefined,
+        perPostCharge: perPostCharge ? Number(perPostCharge) : undefined,
         additionalPageUrl: additionalPageUrl || undefined, bio: bio || undefined, location: location || undefined,
         exclusiveManagement, previousBrandCollab,
       });
@@ -167,11 +165,26 @@ export default function CreatorForm() {
 
         {/* Niche */}
         <div>
-          <label style={labelStyle}>Primary Niche/Category *</label>
-          <select value={niche} onChange={e => setNiche(e.target.value)} style={{ ...inputStyle, cursor: "pointer", appearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L1 3h10z'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 1rem center" }}>
-            <option value="">Select niche</option>
-            {NICHES.map(n => <option key={n} value={n}>{n}</option>)}
-          </select>
+          <label style={labelStyle}>Primary Niche/Category (Multi-select) *</label>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+            {NICHES.map(n => (
+              <button
+                type="button"
+                key={n}
+                onClick={() => setNiche(prev => prev.includes(n) ? prev.filter(x => x !== n) : [...prev, n])}
+                style={{
+                  padding: "0.5rem 1rem", borderRadius: "20px", fontSize: "0.85rem", cursor: "pointer",
+                  border: niche.includes(n) ? "1px solid #FBCF0F" : "1px solid #333",
+                  background: niche.includes(n) ? "#FBCF0F" : "#1a1a1a",
+                  color: niche.includes(n) ? "#111" : "#9ca3af",
+                  fontWeight: niche.includes(n) ? 600 : 400,
+                  transition: "all 0.2s ease"
+                }}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
           {errors.niche && <p style={{ color: "#ef4444", fontSize: "0.8rem", marginTop: "0.3rem" }}>{errors.niche}</p>}
         </div>
 
@@ -209,12 +222,6 @@ export default function CreatorForm() {
           </div>
         </div>
 
-        {/* Total Followers */}
-        <div>
-          <label style={labelStyle}>Total Followers *</label>
-          <input type="number" style={inputStyle} placeholder="Combined followers across all platforms" value={totalFollowers} onChange={e => setTotalFollowers(e.target.value)} />
-          {errors.totalFollowers && <p style={{ color: "#ef4444", fontSize: "0.8rem", marginTop: "0.3rem" }}>{errors.totalFollowers}</p>}
-        </div>
 
         {/* Per Post Charge */}
         <div>

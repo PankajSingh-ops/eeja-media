@@ -21,9 +21,8 @@ interface Creator {
   _id: string;
   fullName: string;
   role: string;
-  niche: string;
+  niche: string[];
   primaryPlatform: string;
-  totalFollowers: number;
   createdAt: string;
 }
 
@@ -81,7 +80,7 @@ export default function DashboardPage() {
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead><tr style={{ borderBottom: "1px solid #333" }}>
-              {["Name", "Role", "Niche", "Platform", "Followers", "Joined"].map(h => (
+              {["Name", "Role", "Niche", "Platform", "Joined"].map(h => (
                 <th key={h} style={{ padding: "0.65rem 0.75rem", textAlign: "left", color: "#9ca3af", fontSize: "0.75rem", fontWeight: 600, textTransform: "uppercase" }}>{h}</th>
               ))}
             </tr></thead>
@@ -90,13 +89,14 @@ export default function DashboardPage() {
                 <tr key={c._id} style={{ borderBottom: "1px solid #1f1f1f" }}>
                   <td style={{ padding: "0.65rem 0.75rem", color: "#fff", fontSize: "0.9rem" }}>{c.fullName}</td>
                   <td style={{ padding: "0.65rem 0.75rem" }}>{roleBadge(c.role)}</td>
-                  <td style={{ padding: "0.65rem 0.75rem", color: "#9ca3af", fontSize: "0.85rem" }}>{c.niche}</td>
+                  <td style={{ padding: "0.65rem 0.75rem", color: "#9ca3af", fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "150px" }}>
+                    {Array.isArray(c.niche) ? c.niche.join(", ") : c.niche}
+                  </td>
                   <td style={{ padding: "0.65rem 0.75rem", color: "#9ca3af", fontSize: "0.85rem" }}>{c.primaryPlatform || "—"}</td>
-                  <td style={{ padding: "0.65rem 0.75rem", color: "#9ca3af", fontSize: "0.85rem" }}>{c.totalFollowers?.toLocaleString()}</td>
                   <td style={{ padding: "0.65rem 0.75rem", color: "#6b7280", fontSize: "0.8rem" }}>{new Date(c.createdAt).toLocaleDateString()}</td>
                 </tr>
               ))}
-              {recent.length === 0 && <tr><td colSpan={6} style={{ padding: "2rem", textAlign: "center", color: "#6b7280" }}>No registrations yet</td></tr>}
+              {recent.length === 0 && <tr><td colSpan={5} style={{ padding: "2rem", textAlign: "center", color: "#6b7280" }}>No registrations yet</td></tr>}
             </tbody>
           </table>
         </div>

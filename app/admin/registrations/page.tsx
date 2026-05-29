@@ -6,8 +6,8 @@ import TopBar from "@/components/admin/TopBar";
 import CreatorDrawer from "@/components/admin/CreatorDrawer";
 
 interface Creator {
-  _id: string; fullName: string; role: string; niche: string; primaryPlatform?: string;
-  totalFollowers: number; perPostCharge: number; bio?: string; location?: string;
+  _id: string; fullName: string; role: string; niche: string[]; primaryPlatform?: string;
+  perPostCharge: number; bio?: string; location?: string;
   additionalPageUrl?: string; socialLinks?: Record<string, string>; createdAt: string;
 }
 
@@ -18,11 +18,7 @@ const PAGE_SIZE = 20;
 const inputStyle: React.CSSProperties = { padding: "0.5rem 0.75rem", background: "#1a1a1a", border: "1px solid #333", borderRadius: "8px", color: "#fff", fontSize: "0.85rem" };
 const selectStyle: React.CSSProperties = { ...inputStyle, cursor: "pointer", appearance: "none" as const, paddingRight: "1.5rem", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%239ca3af' d='M5 7L0 2h10z'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 0.5rem center" };
 
-const fmtFollowers = (n: number) => {
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "M";
-  if (n >= 1_000) return (n / 1_000).toFixed(1) + "K";
-  return n.toString();
-};
+
 
 const roleBadge = (role: string) => {
   const c: Record<string, string> = { creator: "#8b5cf6", influencer: "#f59e0b" };
@@ -34,7 +30,6 @@ export default function RegistrationsPage() {
   const [search, setSearch] = useState(""); const [debouncedSearch, setDebouncedSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState(""); const [nicheFilter, setNicheFilter] = useState("");
   const [platformFilter, setPlatformFilter] = useState("");
-  const [minFollowers, setMinFollowers] = useState(""); const [maxFollowers, setMaxFollowers] = useState("");
   const [minCharge, setMinCharge] = useState(""); const [maxCharge, setMaxCharge] = useState("");
   const [dateFrom, setDateFrom] = useState(""); const [dateTo, setDateTo] = useState("");
   const [sortKey, setSortKey] = useState<string>("createdAt"); const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -50,10 +45,8 @@ export default function RegistrationsPage() {
     let data = [...creators];
     if (debouncedSearch) data = data.filter(c => c.fullName.toLowerCase().includes(debouncedSearch.toLowerCase()));
     if (roleFilter) data = data.filter(c => c.role === roleFilter);
-    if (nicheFilter) data = data.filter(c => c.niche === nicheFilter);
+    if (nicheFilter) data = data.filter(c => Array.isArray(c.niche) ? c.niche.includes(nicheFilter) : c.niche === nicheFilter);
     if (platformFilter) data = data.filter(c => c.primaryPlatform === platformFilter);
-    if (minFollowers) data = data.filter(c => c.totalFollowers >= Number(minFollowers));
-    if (maxFollowers) data = data.filter(c => c.totalFollowers <= Number(maxFollowers));
     if (minCharge) data = data.filter(c => c.perPostCharge >= Number(minCharge));
     if (maxCharge) data = data.filter(c => c.perPostCharge <= Number(maxCharge));
     if (dateFrom) data = data.filter(c => new Date(c.createdAt) >= new Date(dateFrom));
@@ -66,7 +59,7 @@ export default function RegistrationsPage() {
       return sortDir === "asc" ? String(aVal || "").localeCompare(String(bVal || "")) : String(bVal || "").localeCompare(String(aVal || ""));
     });
     return data;
-  }, [creators, debouncedSearch, roleFilter, nicheFilter, platformFilter, minFollowers, maxFollowers, minCharge, maxCharge, dateFrom, dateTo, sortKey, sortDir]);
+  }, [creators, debouncedSearch, roleFilter, nicheFilter, platformFilter, minCharge, maxCharge, dateFrom, dateTo, sortKey, sortDir]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const pageData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -74,7 +67,7 @@ export default function RegistrationsPage() {
   const toggleSort = (key: string) => { if (sortKey === key) { setSortDir(d => d === "asc" ? "desc" : "asc"); } else { setSortKey(key); setSortDir("asc"); } };
   const sortArrow = (key: string) => sortKey === key ? (sortDir === "asc" ? " ↑" : " ↓") : "";
 
-  const clearFilters = () => { setSearch(""); setRoleFilter(""); setNicheFilter(""); setPlatformFilter(""); setMinFollowers(""); setMaxFollowers(""); setMinCharge(""); setMaxCharge(""); setDateFrom(""); setDateTo(""); setPage(1); };
+  const clearFilters = () => { setSearch(""); setRoleFilter(""); setNicheFilter(""); setPlatformFilter(""); setMinCharge(""); setMaxCharge(""); setDateFrom(""); setDateTo(""); setPage(1); };
 
   const handleDelete = useCallback(async (id: string) => {
     try { await axios.delete(`/api/creators/${id}`); setCreators(prev => prev.filter(c => c._id !== id)); setSelected(null); } catch { alert("Failed to delete"); }
@@ -93,8 +86,6 @@ export default function RegistrationsPage() {
         <select value={roleFilter} onChange={e => { setRoleFilter(e.target.value); setPage(1); }} style={selectStyle}><option value="">All Roles</option>{["creator", "influencer"].map(r => <option key={r} value={r} style={{ textTransform: "capitalize" }}>{r}</option>)}</select>
         <select value={nicheFilter} onChange={e => { setNicheFilter(e.target.value); setPage(1); }} style={selectStyle}><option value="">All Niches</option>{NICHES.map(n => <option key={n} value={n}>{n}</option>)}</select>
         <select value={platformFilter} onChange={e => { setPlatformFilter(e.target.value); setPage(1); }} style={selectStyle}><option value="">All Platforms</option>{PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}</select>
-        <input type="number" placeholder="Min Followers" value={minFollowers} onChange={e => { setMinFollowers(e.target.value); setPage(1); }} style={{ ...inputStyle, width: "120px" }} />
-        <input type="number" placeholder="Max Followers" value={maxFollowers} onChange={e => { setMaxFollowers(e.target.value); setPage(1); }} style={{ ...inputStyle, width: "120px" }} />
         <input type="number" placeholder="Min ₹" value={minCharge} onChange={e => { setMinCharge(e.target.value); setPage(1); }} style={{ ...inputStyle, width: "90px" }} />
         <input type="number" placeholder="Max ₹" value={maxCharge} onChange={e => { setMaxCharge(e.target.value); setPage(1); }} style={{ ...inputStyle, width: "90px" }} />
         <input type="date" value={dateFrom} onChange={e => { setDateFrom(e.target.value); setPage(1); }} style={{ ...inputStyle, colorScheme: "dark" }} />
@@ -107,7 +98,7 @@ export default function RegistrationsPage() {
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead><tr style={{ borderBottom: "1px solid #333" }}>
-              {[{ k: "fullName", l: "Name" }, { k: "role", l: "Role" }, { k: "niche", l: "Niche" }, { k: "primaryPlatform", l: "Platform" }, { k: "totalFollowers", l: "Followers" }, { k: "perPostCharge", l: "Per Post" }, { k: "location", l: "Location" }, { k: "createdAt", l: "Joined" }].map(col => (
+              {[{ k: "fullName", l: "Name" }, { k: "role", l: "Role" }, { k: "niche", l: "Niche" }, { k: "primaryPlatform", l: "Platform" }, { k: "perPostCharge", l: "Per Post" }, { k: "location", l: "Location" }, { k: "createdAt", l: "Joined" }].map(col => (
                 <th key={col.k} onClick={() => toggleSort(col.k)} style={{ padding: "0.75rem", textAlign: "left", color: "#9ca3af", fontSize: "0.75rem", fontWeight: 600, textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", userSelect: "none" }}>{col.l}{sortArrow(col.k)}</th>
               ))}
             </tr></thead>
@@ -117,9 +108,8 @@ export default function RegistrationsPage() {
                   onMouseEnter={e => (e.currentTarget.style.background = "#1c1c1c")} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                   <td style={{ padding: "0.7rem 0.75rem", color: "#fff", fontSize: "0.9rem" }}>{(page - 1) * PAGE_SIZE + i + 1}. {c.fullName}</td>
                   <td style={{ padding: "0.7rem 0.75rem" }}>{roleBadge(c.role)}</td>
-                  <td style={{ padding: "0.7rem 0.75rem", color: "#9ca3af", fontSize: "0.85rem" }}>{c.niche}</td>
+                  <td style={{ padding: "0.7rem 0.75rem", color: "#9ca3af", fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "150px" }}>{Array.isArray(c.niche) ? c.niche.join(", ") : c.niche}</td>
                   <td style={{ padding: "0.7rem 0.75rem", color: "#9ca3af", fontSize: "0.85rem" }}>{c.primaryPlatform || "—"}</td>
-                  <td style={{ padding: "0.7rem 0.75rem", color: "#9ca3af", fontSize: "0.85rem" }}>{fmtFollowers(c.totalFollowers)}</td>
                   <td style={{ padding: "0.7rem 0.75rem", color: "#9ca3af", fontSize: "0.85rem" }}>₹{c.perPostCharge?.toLocaleString()}</td>
                   <td style={{ padding: "0.7rem 0.75rem", color: "#9ca3af", fontSize: "0.85rem" }}>{c.location || "—"}</td>
                   <td style={{ padding: "0.7rem 0.75rem", color: "#6b7280", fontSize: "0.8rem" }}>{new Date(c.createdAt).toLocaleDateString()}</td>

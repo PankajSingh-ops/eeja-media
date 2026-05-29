@@ -6,19 +6,7 @@ export interface ICreator extends Document {
   email: string;
   phoneNumber: string;
   role: "creator" | "influencer";
-  niche:
-    | "Fashion"
-    | "Tech"
-    | "Fitness"
-    | "Food"
-    | "Travel"
-    | "Gaming"
-    | "Beauty"
-    | "Finance"
-    | "Education"
-    | "Lifestyle"
-    | "Entertainment"
-    | "Other";
+  niche: string[];
   socialLinks: {
     instagram?: { url: string; followers?: number };
     facebook?: { url: string; followers?: number };
@@ -28,7 +16,6 @@ export interface ICreator extends Document {
     linkedin?: { url: string; followers?: number };
     other?: string;
   };
-  totalFollowers: number;
   additionalPageUrl?: string;
   perPostCharge?: number;
   currency: string;
@@ -58,24 +45,25 @@ const CreatorSchema = new Schema<ICreator>({
     enum: ["creator", "influencer"],
     required: true,
   },
-  niche: {
-    type: String,
-    enum: [
-      "Fashion",
-      "Tech",
-      "Fitness",
-      "Food",
-      "Travel",
-      "Gaming",
-      "Beauty",
-      "Finance",
-      "Education",
-      "Lifestyle",
-      "Entertainment",
-      "Other",
-    ],
-    required: true,
-  },
+  niche: [
+    {
+      type: String,
+      enum: [
+        "Fashion",
+        "Tech",
+        "Fitness",
+        "Food",
+        "Travel",
+        "Gaming",
+        "Beauty",
+        "Finance",
+        "Education",
+        "Lifestyle",
+        "Entertainment",
+        "Other",
+      ],
+    },
+  ],
   socialLinks: {
     instagram: { url: String, followers: Number },
     facebook: { url: String, followers: Number },
@@ -85,7 +73,6 @@ const CreatorSchema = new Schema<ICreator>({
     linkedin: { url: String, followers: Number },
     other: { type: String },
   },
-  totalFollowers: { type: Number, required: true },
   additionalPageUrl: { type: String },
   perPostCharge: { type: Number },
   currency: { type: String, default: "INR" },

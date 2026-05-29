@@ -50,16 +50,7 @@ export function PlatformPieChart({ data }: { data: { name: string; value: number
   );
 }
 
-export function FollowerDistChart({ data }: { data: { name: string; count: number }[] }) {
-  return (
-    <div style={{ background: "#1a1a1a", borderRadius: "14px", padding: "1.5rem" }}>
-      <h3 style={{ color: "#fff", fontSize: "1rem", fontWeight: 600, marginBottom: "1rem" }}>Follower Distribution</h3>
-      <ResponsiveContainer width="100%" height={280}>
-        <BarChart data={data}><XAxis dataKey="name" stroke="#6b7280" fontSize={11} /><YAxis stroke="#6b7280" fontSize={11} /><Tooltip {...tooltipStyle} /><Bar dataKey="count" fill="#14b8a6" radius={[4, 4, 0, 0]} /></BarChart>
-      </ResponsiveContainer>
-    </div>
-  );
-}
+
 
 export function TopNicheChargeChart({ data }: { data: { name: string; avg: number }[] }) {
   return (
