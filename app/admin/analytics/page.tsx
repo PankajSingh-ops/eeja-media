@@ -6,7 +6,7 @@ import TopBar from "@/components/admin/TopBar";
 import { PlatformPieChart, FollowerDistChart, TopNicheChargeChart, RolePieChart } from "@/components/admin/Charts";
 
 interface Creator {
-  role: string; niche: string; primaryPlatform?: string; totalFollowers: number; perPostCharge: number;
+  role: string; niche: string; primaryPlatform?: string; totalFollowers: number; perPostCharge?: number;
 }
 
 export default function AnalyticsPage() {
@@ -30,8 +30,13 @@ export default function AnalyticsPage() {
 
   // Top 5 niches by avg charge
   const nicheCharges: Record<string, number[]> = {};
-  creators.forEach(c => { (nicheCharges[c.niche] = nicheCharges[c.niche] || []).push(c.perPostCharge); });
+  creators.forEach(c => { 
+    if (c.perPostCharge !== undefined && c.perPostCharge !== null) {
+      (nicheCharges[c.niche] = nicheCharges[c.niche] || []).push(c.perPostCharge); 
+    }
+  });
   const nicheAvgData = Object.entries(nicheCharges)
+    .filter(([_, charges]) => charges.length > 0)
     .map(([name, charges]) => ({ name, avg: Math.round(charges.reduce((a, b) => a + b, 0) / charges.length) }))
     .sort((a, b) => b.avg - a.avg)
     .slice(0, 5);

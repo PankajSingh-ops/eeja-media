@@ -4,15 +4,29 @@ import { useState } from "react";
 import axios from "axios";
 import TopBar from "@/components/admin/TopBar";
 
-const CSV_HEADERS = ["Full Name", "Role", "Niche", "Primary Platform", "Instagram", "YouTube", "Twitter", "TikTok", "Facebook", "Other", "Total Followers", "Per Post Charge", "Bio", "Location", "Additional URL", "Joined Date"];
+const CSV_HEADERS = ["Full Name", "Stage Name", "Email", "Phone Number", "Role", "Niche", "Primary Platform", "Content Format", "Instagram URL", "Instagram Followers", "YouTube URL", "YouTube Followers", "Twitter URL", "Twitter Followers", "TikTok URL", "TikTok Followers", "Facebook URL", "Facebook Followers", "LinkedIn URL", "LinkedIn Followers", "Other", "Total Followers", "Per Post Charge", "Bio", "Location", "Additional URL", "Joined Date"];
 
 function toCSV(creators: Record<string, unknown>[]) {
   const rows = creators.map(c => {
-    const sl = (c.socialLinks || {}) as Record<string, string>;
+    const sl = (c.socialLinks || {}) as Record<string, any>;
+    const getSocial = (key: string) => {
+        const val = sl[key];
+        if (typeof val === 'string') return [val, ""];
+        if (typeof val === 'object' && val !== null) return [val.url || "", val.followers || ""];
+        return ["", ""];
+    };
+    
+    const [igUrl, igFollowers] = getSocial("instagram");
+    const [ytUrl, ytFollowers] = getSocial("youtube");
+    const [twUrl, twFollowers] = getSocial("twitter");
+    const [tkUrl, tkFollowers] = getSocial("tiktok");
+    const [fbUrl, fbFollowers] = getSocial("facebook");
+    const [liUrl, liFollowers] = getSocial("linkedin");
+
     return [
-      c.fullName, c.role, c.niche, c.primaryPlatform || "",
-      sl.instagram || "", sl.youtube || "", sl.twitter || "", sl.tiktok || "", sl.facebook || "", sl.other || "",
-      c.totalFollowers, c.perPostCharge, ((c.bio as string) || "").replace(/"/g, '""'),
+      c.fullName, c.stageName || "", c.email || "", c.phoneNumber || "", c.role, c.niche, c.primaryPlatform || "", c.contentFormat || "",
+      igUrl, igFollowers, ytUrl, ytFollowers, twUrl, twFollowers, tkUrl, tkFollowers, fbUrl, fbFollowers, liUrl, liFollowers, sl.other || "",
+      c.totalFollowers, c.perPostCharge || "", ((c.bio as string) || "").replace(/"/g, '""'),
       c.location || "", c.additionalPageUrl || "",
       c.createdAt ? new Date(c.createdAt as string).toLocaleDateString() : "",
     ].map(v => `"${v}"`).join(",");

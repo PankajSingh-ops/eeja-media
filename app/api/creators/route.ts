@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate required fields
-    const requiredFields = ["fullName", "role", "niche", "totalFollowers", "perPostCharge"];
+    const requiredFields = ["fullName", "email", "phoneNumber", "role", "niche", "totalFollowers"];
     const missingFields: string[] = [];
 
     for (const field of requiredFields) {

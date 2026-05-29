@@ -2,6 +2,9 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface ICreator extends Document {
   fullName: string;
+  stageName?: string;
+  email: string;
+  phoneNumber: string;
   role: "creator" | "influencer";
   niche:
     | "Fashion"
@@ -17,17 +20,17 @@ export interface ICreator extends Document {
     | "Entertainment"
     | "Other";
   socialLinks: {
-    instagram?: string;
-    facebook?: string;
-    twitter?: string;
-    youtube?: string;
-    tiktok?: string;
-    linkedin?: string;
+    instagram?: { url: string; followers?: number };
+    facebook?: { url: string; followers?: number };
+    twitter?: { url: string; followers?: number };
+    youtube?: { url: string; followers?: number };
+    tiktok?: { url: string; followers?: number };
+    linkedin?: { url: string; followers?: number };
     other?: string;
   };
   totalFollowers: number;
   additionalPageUrl?: string;
-  perPostCharge: number;
+  perPostCharge?: number;
   currency: string;
   bio?: string;
   location?: string;
@@ -41,11 +44,15 @@ export interface ICreator extends Document {
     | "Facebook"
     | "LinkedIn"
     | "Other";
+  contentFormat?: string;
   createdAt: Date;
 }
 
 const CreatorSchema = new Schema<ICreator>({
   fullName: { type: String, required: true },
+  stageName: { type: String },
+  email: { type: String, required: true },
+  phoneNumber: { type: String, required: true },
   role: {
     type: String,
     enum: ["creator", "influencer"],
@@ -70,17 +77,17 @@ const CreatorSchema = new Schema<ICreator>({
     required: true,
   },
   socialLinks: {
-    instagram: { type: String },
-    facebook: { type: String },
-    twitter: { type: String },
-    youtube: { type: String },
-    tiktok: { type: String },
-    linkedin: { type: String },
+    instagram: { url: String, followers: Number },
+    facebook: { url: String, followers: Number },
+    twitter: { url: String, followers: Number },
+    youtube: { url: String, followers: Number },
+    tiktok: { url: String, followers: Number },
+    linkedin: { url: String, followers: Number },
     other: { type: String },
   },
   totalFollowers: { type: Number, required: true },
   additionalPageUrl: { type: String },
-  perPostCharge: { type: Number, required: true },
+  perPostCharge: { type: Number },
   currency: { type: String, default: "INR" },
   bio: { type: String, maxlength: 500 },
   location: { type: String },
@@ -98,6 +105,7 @@ const CreatorSchema = new Schema<ICreator>({
       "Other",
     ],
   },
+  contentFormat: { type: String },
   createdAt: { type: Date, default: Date.now },
 });
 

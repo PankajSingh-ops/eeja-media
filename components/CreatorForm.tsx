@@ -6,6 +6,7 @@ import axios from "axios";
 const ROLES = ["creator", "influencer"] as const;
 const PLATFORMS = ["Instagram", "YouTube", "TikTok", "Twitter/X", "Facebook", "LinkedIn", "Other"] as const;
 const NICHES = ["Fashion", "Tech", "Fitness", "Food", "Travel", "Gaming", "Beauty", "Finance", "Education", "Lifestyle", "Entertainment", "Other"] as const;
+const FORMATS = ["Reels", "Long-form", "Blogs", "Graphics", "Shorts", "Photos", "Other"] as const;
 
 const DEFAULT_SOCIALS = [
   { key: "instagram", label: "Instagram", icon: "📸" },
@@ -14,7 +15,7 @@ const DEFAULT_SOCIALS = [
   { key: "tiktok", label: "TikTok", icon: "🎵" },
 ];
 
-interface ExtraPlatform { name: string; url: string; }
+interface ExtraPlatform { name: string; url: string; followers?: string; }
 
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "0.75rem 1rem", background: "#1a1a1a",
@@ -29,10 +30,14 @@ const labelStyle: React.CSSProperties = {
 
 export default function CreatorForm() {
   const [fullName, setFullName] = useState("");
+  const [stageName, setStageName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [role, setRole] = useState<string>("");
   const [primaryPlatform, setPrimaryPlatform] = useState("");
   const [niche, setNiche] = useState("");
-  const [socials, setSocials] = useState<Record<string, string>>({ instagram: "", youtube: "", twitter: "", tiktok: "" });
+  const [contentFormat, setContentFormat] = useState("");
+  const [socials, setSocials] = useState<Record<string, { url: string; followers?: string }>>({ instagram: { url: "" }, youtube: { url: "" }, twitter: { url: "" }, tiktok: { url: "" } });
   const [extraPlatforms, setExtraPlatforms] = useState<ExtraPlatform[]>([]);
   const [totalFollowers, setTotalFollowers] = useState("");
   const [perPostCharge, setPerPostCharge] = useState("");
@@ -49,10 +54,12 @@ export default function CreatorForm() {
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fullName.trim()) e.fullName = "Full name is required";
+    if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email)) e.email = "Valid email is required";
+    if (!phoneNumber.trim()) e.phoneNumber = "Phone number is required";
     if (!role) e.role = "Please select a role";
     if (!niche) e.niche = "Please select a niche";
     if (!totalFollowers || Number(totalFollowers) < 0) e.totalFollowers = "Enter valid follower count";
-    if (!perPostCharge || Number(perPostCharge) < 0) e.perPostCharge = "Enter valid charge";
+    if (perPostCharge && Number(perPostCharge) < 0) e.perPostCharge = "Enter valid charge";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -63,9 +70,15 @@ export default function CreatorForm() {
     setLoading(true);
     try {
       await axios.post("/api/creators", {
-        fullName: fullName.trim(), role, niche, primaryPlatform: primaryPlatform || undefined,
-        socialLinks: { ...socials, ...(extraPlatforms.length ? { other: extraPlatforms.map(p => `${p.name}: ${p.url}`).join(", ") } : {}) },
-        totalFollowers: Number(totalFollowers), perPostCharge: Number(perPostCharge),
+        fullName: fullName.trim(), stageName: stageName.trim() || undefined,
+        email: email.trim(), phoneNumber: phoneNumber.trim(),
+        role, niche, primaryPlatform: primaryPlatform || undefined,
+        contentFormat: contentFormat || undefined,
+        socialLinks: { 
+          ...Object.fromEntries(Object.entries(socials).filter(([_, v]) => v.url).map(([k, v]) => [k, { url: v.url, followers: v.followers ? Number(v.followers) : undefined }])),
+          ...(extraPlatforms.length ? { other: extraPlatforms.map(p => `${p.name}: ${p.url}${p.followers ? ` (${p.followers} followers)` : ''}`).join(", ") } : {}) 
+        },
+        totalFollowers: Number(totalFollowers), perPostCharge: perPostCharge ? Number(perPostCharge) : undefined,
         additionalPageUrl: additionalPageUrl || undefined, bio: bio || undefined, location: location || undefined,
         exclusiveManagement, previousBrandCollab,
       });
@@ -101,6 +114,32 @@ export default function CreatorForm() {
           {errors.fullName && <p style={{ color: "#ef4444", fontSize: "0.8rem", marginTop: "0.3rem" }}>{errors.fullName}</p>}
         </div>
 
+        {/* Stage Name */}
+        <div>
+          <label style={labelStyle}>Stage Name (if any)</label>
+          <input style={inputStyle} placeholder="Your stage name or alias" value={stageName} onChange={e => setStageName(e.target.value)} />
+        </div>
+
+        {/* Email */}
+        <div>
+          <label style={labelStyle}>Email *</label>
+          <input type="email" style={inputStyle} placeholder="Your email address" value={email} onChange={e => setEmail(e.target.value)} />
+          {errors.email && <p style={{ color: "#ef4444", fontSize: "0.8rem", marginTop: "0.3rem" }}>{errors.email}</p>}
+        </div>
+
+        {/* Phone Number */}
+        <div>
+          <label style={labelStyle}>Phone Number *</label>
+          <input type="tel" style={inputStyle} placeholder="Your phone number" value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} />
+          {errors.phoneNumber && <p style={{ color: "#ef4444", fontSize: "0.8rem", marginTop: "0.3rem" }}>{errors.phoneNumber}</p>}
+        </div>
+
+           {/* Location */}
+        <div>
+          <label style={labelStyle}>Location</label>
+          <input style={inputStyle} placeholder="City, Country (optional)" value={location} onChange={e => setLocation(e.target.value)} />
+        </div>
+
         {/* Role */}
         <div>
           <label style={labelStyle}>I am a *</label>
@@ -128,7 +167,7 @@ export default function CreatorForm() {
 
         {/* Niche */}
         <div>
-          <label style={labelStyle}>Niche *</label>
+          <label style={labelStyle}>Primary Niche/Category *</label>
           <select value={niche} onChange={e => setNiche(e.target.value)} style={{ ...inputStyle, cursor: "pointer", appearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L1 3h10z'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 1rem center" }}>
             <option value="">Select niche</option>
             {NICHES.map(n => <option key={n} value={n}>{n}</option>)}
@@ -136,22 +175,33 @@ export default function CreatorForm() {
           {errors.niche && <p style={{ color: "#ef4444", fontSize: "0.8rem", marginTop: "0.3rem" }}>{errors.niche}</p>}
         </div>
 
+        {/* Content Format */}
+        <div>
+          <label style={labelStyle}>Content Format</label>
+          <select value={contentFormat} onChange={e => setContentFormat(e.target.value)} style={{ ...inputStyle, cursor: "pointer", appearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L1 3h10z'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 1rem center" }}>
+            <option value="">Select format</option>
+            {FORMATS.map(f => <option key={f} value={f}>{f}</option>)}
+          </select>
+        </div>
+
         {/* Social Links */}
         <div>
-          <label style={labelStyle}>Your Platforms</label>
+          <label style={labelStyle}>Social Handles/Links</label>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             {DEFAULT_SOCIALS.map(s => (
-              <div key={s.key} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <div key={s.key} style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
                 <span style={{ width: "2rem", textAlign: "center", fontSize: "1.1rem" }}>{s.icon}</span>
                 <span style={{ width: "5rem", color: "#9ca3af", fontSize: "0.85rem" }}>{s.label}</span>
-                <input style={{ ...inputStyle, flex: 1 }} placeholder={`${s.label} URL`} value={socials[s.key]} onChange={e => setSocials(prev => ({ ...prev, [s.key]: e.target.value }))} />
+                <input style={{ ...inputStyle, flex: 1, minWidth: "120px" }} placeholder={`${s.label} URL`} value={socials[s.key]?.url || ""} onChange={e => setSocials(prev => ({ ...prev, [s.key]: { ...prev[s.key], url: e.target.value } }))} />
+                <input type="number" style={{ ...inputStyle, width: "8rem", flex: "none" }} placeholder="Followers" value={socials[s.key]?.followers || ""} onChange={e => setSocials(prev => ({ ...prev, [s.key]: { ...prev[s.key], followers: e.target.value } }))} />
               </div>
             ))}
             {extraPlatforms.map((ep, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
                 <span style={{ width: "2rem", textAlign: "center" }}>🔗</span>
                 <input style={{ ...inputStyle, width: "5rem", flex: "none" }} placeholder="Name" value={ep.name} onChange={e => { const arr = [...extraPlatforms]; arr[i].name = e.target.value; setExtraPlatforms(arr); }} />
-                <input style={{ ...inputStyle, flex: 1 }} placeholder="URL" value={ep.url} onChange={e => { const arr = [...extraPlatforms]; arr[i].url = e.target.value; setExtraPlatforms(arr); }} />
+                <input style={{ ...inputStyle, flex: 1, minWidth: "120px" }} placeholder="URL" value={ep.url} onChange={e => { const arr = [...extraPlatforms]; arr[i].url = e.target.value; setExtraPlatforms(arr); }} />
+                <input type="number" style={{ ...inputStyle, width: "8rem", flex: "none" }} placeholder="Followers" value={ep.followers || ""} onChange={e => { const arr = [...extraPlatforms]; arr[i].followers = e.target.value; setExtraPlatforms(arr); }} />
                 <button type="button" onClick={() => setExtraPlatforms(prev => prev.filter((_, j) => j !== i))} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: "1.2rem" }}>×</button>
               </div>
             ))}
@@ -168,7 +218,7 @@ export default function CreatorForm() {
 
         {/* Per Post Charge */}
         <div>
-          <label style={labelStyle}>Per Post Charge (INR) *</label>
+          <label style={labelStyle}>Base Charge (INR)</label>
           <div style={{ position: "relative" }}>
             <span style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: "#FBCF0F", fontWeight: 700 }}>₹</span>
             <input type="number" style={{ ...inputStyle, paddingLeft: "2rem" }} placeholder="Your rate per sponsored post" value={perPostCharge} onChange={e => setPerPostCharge(e.target.value)} />
@@ -191,11 +241,7 @@ export default function CreatorForm() {
           </div>
         </div>
 
-        {/* Location */}
-        <div>
-          <label style={labelStyle}>Location</label>
-          <input style={inputStyle} placeholder="City, Country (optional)" value={location} onChange={e => setLocation(e.target.value)} />
-        </div>
+     
 
         {/* Previous Brand Collab */}
         <div>

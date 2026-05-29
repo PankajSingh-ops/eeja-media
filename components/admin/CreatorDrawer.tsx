@@ -8,15 +8,19 @@ import ConfirmModal from "./ConfirmModal";
 interface Creator {
   _id: string;
   fullName: string;
+  stageName?: string;
+  email?: string;
+  phoneNumber?: string;
   role: string;
   niche: string;
   primaryPlatform?: string;
+  contentFormat?: string;
   totalFollowers: number;
-  perPostCharge: number;
+  perPostCharge?: number;
   bio?: string;
   location?: string;
   additionalPageUrl?: string;
-  socialLinks?: Record<string, string>;
+  socialLinks?: Record<string, any>;
   exclusiveManagement?: boolean;
   previousBrandCollab?: boolean;
   createdAt: string;
@@ -24,6 +28,7 @@ interface Creator {
 
 const PLATFORMS = ["Instagram", "YouTube", "TikTok", "Twitter/X", "Facebook", "LinkedIn", "Other"];
 const NICHES = ["Fashion", "Tech", "Fitness", "Food", "Travel", "Gaming", "Beauty", "Finance", "Education", "Lifestyle", "Entertainment", "Other"];
+const FORMATS = ["Reels", "Long-form", "Blogs", "Graphics", "Shorts", "Photos", "Other"];
 
 export default function CreatorDrawer({ creator, onClose, onDelete, onUpdate }: { creator: Creator | null; onClose: () => void; onDelete: (id: string) => void; onUpdate: () => void }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -112,6 +117,21 @@ export default function CreatorDrawer({ creator, onClose, onDelete, onUpdate }: 
                 <label style={labelStyle}>Full Name</label>
                 <input style={inputStyle} value={editData.fullName || ""} onChange={e => setEditData({ ...editData, fullName: e.target.value })} />
               </div>
+
+              <div>
+                <label style={labelStyle}>Stage Name</label>
+                <input style={inputStyle} value={editData.stageName || ""} onChange={e => setEditData({ ...editData, stageName: e.target.value })} />
+              </div>
+
+              <div>
+                <label style={labelStyle}>Email</label>
+                <input type="email" style={inputStyle} value={editData.email || ""} onChange={e => setEditData({ ...editData, email: e.target.value })} />
+              </div>
+
+              <div>
+                <label style={labelStyle}>Phone Number</label>
+                <input type="tel" style={inputStyle} value={editData.phoneNumber || ""} onChange={e => setEditData({ ...editData, phoneNumber: e.target.value })} />
+              </div>
               
               <div>
                 <label style={labelStyle}>Role</label>
@@ -140,13 +160,21 @@ export default function CreatorDrawer({ creator, onClose, onDelete, onUpdate }: 
               </div>
 
               <div>
+                <label style={labelStyle}>Content Format</label>
+                <select style={inputStyle} value={editData.contentFormat || ""} onChange={e => setEditData({ ...editData, contentFormat: e.target.value })}>
+                  <option value="">Select format</option>
+                  {FORMATS.map(f => <option key={f} value={f}>{f}</option>)}
+                </select>
+              </div>
+
+              <div>
                 <label style={labelStyle}>Total Followers</label>
                 <input type="number" style={inputStyle} value={editData.totalFollowers || 0} onChange={e => setEditData({ ...editData, totalFollowers: Number(e.target.value) })} />
               </div>
 
               <div>
                 <label style={labelStyle}>Per Post Charge ($/₹)</label>
-                <input type="number" style={inputStyle} value={editData.perPostCharge || 0} onChange={e => setEditData({ ...editData, perPostCharge: Number(e.target.value) })} />
+                <input type="number" style={inputStyle} value={editData.perPostCharge || ""} onChange={e => setEditData({ ...editData, perPostCharge: Number(e.target.value) || undefined })} />
               </div>
 
               <div>
@@ -167,12 +195,22 @@ export default function CreatorDrawer({ creator, onClose, onDelete, onUpdate }: 
 
               <div>
                 <label style={labelStyle}>Social Links</label>
-                {["instagram", "youtube", "twitter", "tiktok", "facebook", "linkedin", "other"].map(platform => (
-                  <div key={platform} style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
-                    <span style={{ width: "20px" }}>{socialIcons[platform] || "🔗"}</span>
-                    <input style={inputStyle} placeholder={`${platform} URL`} value={(editData.socialLinks || {})[platform] || ""} onChange={e => setEditData({ ...editData, socialLinks: { ...(editData.socialLinks || {}), [platform]: e.target.value } })} />
-                  </div>
-                ))}
+                {["instagram", "youtube", "twitter", "tiktok", "facebook", "linkedin"].map(platform => {
+                  const val = (editData.socialLinks || {})[platform] || { url: "", followers: "" };
+                  const url = typeof val === "string" ? val : val.url;
+                  const followers = typeof val === "object" ? val.followers : "";
+                  return (
+                    <div key={platform} style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem", flexWrap: "wrap" }}>
+                      <span style={{ width: "20px" }}>{socialIcons[platform] || "🔗"}</span>
+                      <input style={{ ...inputStyle, flex: 1, minWidth: "120px" }} placeholder={`${platform} URL`} value={url || ""} onChange={e => setEditData({ ...editData, socialLinks: { ...(editData.socialLinks || {}), [platform]: { url: e.target.value, followers } } })} />
+                      <input type="number" style={{ ...inputStyle, width: "8rem" }} placeholder="Followers" value={followers || ""} onChange={e => setEditData({ ...editData, socialLinks: { ...(editData.socialLinks || {}), [platform]: { url, followers: Number(e.target.value) || undefined } } })} />
+                    </div>
+                  );
+                })}
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                  <span style={{ width: "20px" }}>🔗</span>
+                  <input style={inputStyle} placeholder="Other Links (e.g. Name: URL)" value={(editData.socialLinks || {}).other || ""} onChange={e => setEditData({ ...editData, socialLinks: { ...(editData.socialLinks || {}), other: e.target.value } })} />
+                </div>
               </div>
               
               <div>
@@ -194,22 +232,25 @@ export default function CreatorDrawer({ creator, onClose, onDelete, onUpdate }: 
             <>
               <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
                 <div style={{ width: "64px", height: "64px", borderRadius: "50%", background: `linear-gradient(135deg, ${roleBg[creator.role] || "#8b5cf6"}, #4c1d95)`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 0.75rem", color: "#fff", fontWeight: 700, fontSize: "1.25rem" }}>{initials}</div>
-                <h4 style={{ color: "#fff", fontWeight: 700, fontSize: "1.15rem", marginBottom: "0.25rem" }}>{creator.fullName}</h4>
+                <h4 style={{ color: "#fff", fontWeight: 700, fontSize: "1.15rem", marginBottom: "0.25rem" }}>{creator.fullName} {creator.stageName ? `(${creator.stageName})` : ""}</h4>
                 <span style={{ background: roleBg[creator.role] || "#666", color: "#fff", padding: "2px 12px", borderRadius: "999px", fontSize: "0.75rem", fontWeight: 600, textTransform: "capitalize" }}>{creator.role}</span>
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", marginBottom: "1.5rem" }}>
                 {[
+                  { label: "Email", value: creator.email || "—" },
+                  { label: "Phone", value: creator.phoneNumber || "—" },
                   { label: "Niche", value: creator.niche },
+                  { label: "Format", value: creator.contentFormat || "—" },
                   { label: "Platform", value: creator.primaryPlatform || "—" },
                   { label: "Followers", value: creator.totalFollowers?.toLocaleString() },
-                  { label: "Per Post", value: `₹${creator.perPostCharge}` },
+                  { label: "Per Post", value: creator.perPostCharge ? `₹${creator.perPostCharge}` : "—" },
                   { label: "Location", value: creator.location || "—" },
                   { label: "Joined", value: new Date(creator.createdAt).toLocaleDateString() },
                 ].map(s => (
                   <div key={s.label} style={{ background: "#1a1a1a", borderRadius: "10px", padding: "0.75rem" }}>
                     <p style={{ color: "#6b7280", fontSize: "0.7rem", textTransform: "uppercase", marginBottom: "0.25rem" }}>{s.label}</p>
-                    <p style={{ color: "#fff", fontSize: "0.9rem", fontWeight: 500 }}>{s.value}</p>
+                    <p style={{ color: "#fff", fontSize: "0.9rem", fontWeight: 500, overflowWrap: "anywhere" }}>{s.value}</p>
                   </div>
                 ))}
               </div>
@@ -225,12 +266,23 @@ export default function CreatorDrawer({ creator, onClose, onDelete, onUpdate }: 
                 <div style={{ marginBottom: "1.5rem" }}>
                   <p style={{ color: "#9ca3af", fontSize: "0.8rem", marginBottom: "0.5rem", textTransform: "uppercase" }}>Social Links</p>
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                    {Object.entries(creator.socialLinks).filter(([, v]) => v).map(([key, url]) => (
-                      <a key={key} href={url} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "#a78bfa", fontSize: "0.85rem", textDecoration: "none", padding: "0.4rem 0.75rem", background: "#1a1a1a", borderRadius: "8px" }}>
-                        <span>{socialIcons[key] || "🔗"}</span>
-                        <span style={{ textTransform: "capitalize" }}>{key}</span>
-                      </a>
-                    ))}
+                    {Object.entries(creator.socialLinks).filter(([, v]) => v).map(([key, value]) => {
+                      if (key === "other") {
+                        return <div key={key} style={{ color: "#a78bfa", fontSize: "0.85rem", overflowWrap: "anywhere", background: "#1a1a1a", padding: "0.4rem 0.75rem", borderRadius: "8px" }}>🔗 {value as string}</div>;
+                      }
+                      const url = typeof value === 'string' ? value : value?.url;
+                      const followers = typeof value === 'object' && value?.followers ? ` (${value.followers.toLocaleString()} followers)` : '';
+                      if (!url) return null;
+                      return (
+                        <a key={key} href={url} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", color: "#a78bfa", fontSize: "0.85rem", textDecoration: "none", padding: "0.4rem 0.75rem", background: "#1a1a1a", borderRadius: "8px" }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                            <span>{socialIcons[key] || "🔗"}</span>
+                            <span style={{ textTransform: "capitalize" }}>{key}</span>
+                          </span>
+                          <span style={{ color: "#9ca3af", fontSize: "0.75rem" }}>{followers}</span>
+                        </a>
+                      );
+                    })}
                   </div>
                 </div>
               )}
